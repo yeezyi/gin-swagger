@@ -20,6 +20,7 @@ type swaggerConfig struct {
 	Title                    string
 	Oauth2RedirectURL        template.JS
 	DefaultModelsExpandDepth int
+	DefaultModelExpandDepth  int
 	DeepLinking              bool
 	PersistAuthorization     bool
 	Oauth2DefaultClientID    string
@@ -33,6 +34,7 @@ type Config struct {
 	InstanceName             string
 	Title                    string
 	DefaultModelsExpandDepth int
+	DefaultModelExpandDepth  int
 	DeepLinking              bool
 	PersistAuthorization     bool
 	Oauth2DefaultClientID    string
@@ -44,6 +46,7 @@ func (config Config) toSwaggerConfig() swaggerConfig {
 		DeepLinking:              config.DeepLinking,
 		DocExpansion:             config.DocExpansion,
 		DefaultModelsExpandDepth: config.DefaultModelsExpandDepth,
+		DefaultModelExpandDepth:  config.DefaultModelExpandDepth,
 		Oauth2RedirectURL: "`${window.location.protocol}//${window.location.host}$" +
 			"{window.location.pathname.split('/').slice(0, window.location.pathname.split('/').length - 1).join('/')}" +
 			"/oauth2-redirect.html`",
@@ -82,6 +85,12 @@ func DefaultModelsExpandDepth(depth int) func(*Config) {
 	}
 }
 
+func DefaultModelExpandDepth(depth int) func(*Config) {
+	return func(c *Config) {
+		c.DefaultModelExpandDepth = depth
+	}
+}
+
 // InstanceName set the instance name that was used to generate the swagger documents
 // Defaults to swag.Name ("swagger").
 func InstanceName(name string) func(*Config) {
@@ -113,6 +122,7 @@ func WrapHandler(handler *webdav.Handler, options ...func(*Config)) gin.HandlerF
 		InstanceName:             swag.Name,
 		Title:                    "Swagger UI",
 		DefaultModelsExpandDepth: 1,
+		DefaultModelExpandDepth:  10,
 		DeepLinking:              true,
 		PersistAuthorization:     false,
 		Oauth2DefaultClientID:    "",
@@ -310,7 +320,8 @@ window.onload = function() {
 	layout: "StandaloneLayout",
     docExpansion: "{{.DocExpansion}}",
 	deepLinking: {{.DeepLinking}},
-	defaultModelsExpandDepth: {{.DefaultModelsExpandDepth}}
+	defaultModelsExpandDepth: {{.DefaultModelsExpandDepth}},
+	defaultModelExpandDepth: {{.DefaultModelExpandDepth}}
   })
 
   const defaultClientId = "{{.Oauth2DefaultClientID}}";
