@@ -1,4 +1,4 @@
-module gin-swagger
+module github.com/yeezyi/gin-swagger
 
 go 1.17
 
